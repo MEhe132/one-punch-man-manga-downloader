@@ -1,0 +1,31 @@
+# Virtual environments
+venv/
+.venv/
+ENV/
+env/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Downloaded manga images and media
+Manga Images/
+downloaded_images/
+All monga image of one punch man*/
+*.webp
+*.jpg
+*.jpeg
+*.png
+*.tmp
+
+# Operating system artifacts
+.DS_Store
+Thumbs.db
+
+# IDE and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
