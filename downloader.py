@@ -8,6 +8,7 @@ Features:
 - Multithreaded image downloads with ThreadPoolExecutor
 - Dual tqdm progress bars (Chapters progress + Per-page download progress)
 - Flexible CLI arguments: --chapter (-c), --range (-r), --start, --end, --workers (-w)
+- Automated Comic Book Archive (.cbz) packaging via --cbz flag
 - Resumable: skips already downloaded, valid non-empty images
 - Robust retry with exponential backoff & HTTP 429 rate-limit handling
 - Sanitized filenames for Windows/Linux path safety
@@ -19,6 +20,7 @@ import os
 import re
 import sys
 import time
+import zipfile
 import argparse
 from typing import List, Dict, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -73,6 +75,31 @@ def parse_range_string(range_str: str) -> Tuple[int, int]:
     if start > end:
         start, end = end, start
     return start, end
+
+
+def create_cbz(chapter_folder: str) -> Optional[str]:
+    """
+    Compress downloaded chapter images into a Comic Book Zip (.cbz) file.
+    .cbz is a standard format recognized by Tachiyomi, Mihon, CDisplayEx,
+    and digital comic e-readers.
+    """
+    if not os.path.isdir(chapter_folder):
+        return None
+
+    cbz_path = f"{chapter_folder}.cbz"
+    images = sorted([
+        f for f in os.listdir(chapter_folder)
+        if f.lower().endswith((".webp", ".jpg", ".jpeg", ".png"))
+    ])
+    if not images:
+        return None
+
+    with zipfile.ZipFile(cbz_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for img in images:
+            img_path = os.path.join(chapter_folder, img)
+            zf.write(img_path, arcname=img)
+
+    return cbz_path
 
 
 class MangaClient:
@@ -134,7 +161,7 @@ class MangaClient:
 
 
 class OnePunchManDownloader:
-    """Manages chapter retrieval, folder structure, and multithreaded downloads."""
+    """Manages chapter retrieval, folder structure, multithreaded downloads, and CBZ archives."""
 
     def __init__(
         self,
@@ -143,11 +170,13 @@ class OnePunchManDownloader:
         max_workers: int = DEFAULT_WORKERS,
         timeout: int = DEFAULT_TIMEOUT,
         delay_between_chapters: float = 0.0,
+        export_cbz: bool = False,
     ):
         self.base_url = base_url
         self.output_dir = output_dir
         self.max_workers = max_workers
         self.delay_between_chapters = delay_between_chapters
+        self.export_cbz = export_cbz
         self.client = MangaClient(timeout=timeout)
 
     def get_chapters(self) -> List[Dict[str, str]]:
@@ -265,7 +294,14 @@ class OnePunchManDownloader:
             try:
                 tqdm.write(f"[+] Processing Chapter {idx}: {ch['name']}")
                 count = self.download_chapter_images(ch["url"], chapter_folder)
-                tqdm.write(f"    [+] Saved {count} pages into {chapter_folder}\n")
+                tqdm.write(f"    [+] Saved {count} pages into {chapter_folder}")
+
+                if self.export_cbz:
+                    cbz_path = create_cbz(chapter_folder)
+                    if cbz_path:
+                        tqdm.write(f"    [+] Created CBZ archive: {os.path.basename(cbz_path)}")
+
+                tqdm.write("")
 
                 if self.delay_between_chapters > 0:
                     time.sleep(self.delay_between_chapters)
@@ -331,6 +367,11 @@ def main():
         help="Download a single chapter directly by its full URL",
     )
     parser.add_argument(
+        "--cbz",
+        action="store_true",
+        help="Automatically pack each downloaded chapter into a .cbz (Comic Book Zip) file for comic readers",
+    )
+    parser.add_argument(
         "--delay",
         type=float,
         default=0.0,
@@ -361,6 +402,7 @@ def main():
         max_workers=args.workers,
         timeout=args.timeout,
         delay_between_chapters=args.delay,
+        export_cbz=args.cbz,
     )
 
     if args.chapter_url:
@@ -369,6 +411,10 @@ def main():
         print(f"[*] Downloading single chapter from {args.chapter_url} to {target_dir}")
         count = downloader.download_chapter_images(args.chapter_url, target_dir)
         print(f"[+] Downloaded/verified {count} images in '{target_dir}'.")
+        if args.cbz:
+            cbz_path = create_cbz(target_dir)
+            if cbz_path:
+                print(f"[+] Created CBZ archive: {cbz_path}")
     else:
         downloader.run(start_idx=start_idx, end_idx=end_idx)
 

@@ -7,13 +7,14 @@
   <a href="https://github.com/MEhe132/one-punch-man-manga-downloader"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome" /></a>
 </p>
 
-A fast, multithreaded Python web scraper and manga downloader designed to scrape and download One Punch Man chapters in organized, chapter-wise folders with interactive progress bars.
+A fast, multithreaded Python web scraper and manga downloader designed to scrape and download One Punch Man chapters in organized, chapter-wise folders with interactive progress bars and optional Comic Book Zip (`.cbz`) packaging.
 
 ---
 
 ## 🚀 Key Features
 
 - **⚡ Multithreaded Image Downloads**: Utilizes Python's `concurrent.futures.ThreadPoolExecutor` for concurrent page downloads, drastically cutting down total download time.
+- **📚 Automatic Comic Book Archive (`.cbz`) Packaging**: Optional `--cbz` flag automatically zips and packs each downloaded chapter into a standard `.cbz` file ready for Tachiyomi, Mihon, CDisplayEx, and e-readers.
 - **📊 Dual Interactive Progress Bars**: Real-time visual progress tracking powered by `tqdm` for both total chapter queue and individual page downloads.
 - **🎯 Flexible Targeting & CLI Flags**:
   - Download a single chapter by number (`-c 5` or `--chapter 5`).
@@ -79,18 +80,18 @@ pip install -r requirements.txt
 
 ## 📖 Usage & CLI Examples
 
-### Download a Single Chapter
+### Download a Single Chapter with Automatic `.cbz` Archive
 ```bash
-python main.py -c 5
+python main.py -c 5 --cbz
 # or
-python main.py --chapter 211
+python main.py --chapter 211 --cbz
 ```
 
 ### Download a Range of Chapters
 ```bash
 python main.py -r 1-10
 # or with double-dot syntax:
-python main.py --range 5..15
+python main.py --range 5..15 --cbz
 ```
 
 ### Download All Chapters
@@ -106,12 +107,12 @@ python main.py -r 1-5 -w 8 --delay 1.0
 
 ### Download a Specific Chapter Directly by URL
 ```bash
-python main.py --chapter-url "https://readonepunch-man.com/one-punch-man-chapter-211/"
+python main.py --chapter-url "https://readonepunch-man.com/one-punch-man-chapter-211/" --cbz
 ```
 
 ### Specify a Custom Output Directory
 ```bash
-python main.py -r 1-5 -o "Manga Collection"
+python main.py -r 1-5 -o "Manga Collection" --cbz
 ```
 
 ### View All CLI Options
@@ -127,6 +128,7 @@ python main.py --help
 | :--- | :---: | :---: | :--- |
 | `--chapter` | `-c` | `None` | Download a single chapter by its number (e.g. `-c 15`) |
 | `--range` | `-r` | `None` | Download a range of chapters (e.g. `-r 1-10` or `5..15`) |
+| `--cbz` | | `False` | Automatically pack each downloaded chapter into a `.cbz` archive for comic readers |
 | `--start` | | `None` | Start chapter index |
 | `--end` | | `None` | End chapter index |
 | `--workers` | `-w` | `5` | Concurrent download threads per chapter |
