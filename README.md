@@ -1,6 +1,7 @@
 # 🥊 One Punch Man Manga Downloader
 
 <p align="center">
+  <a href="https://github.com/MEhe132/one-punch-man-manga-downloader/actions/workflows/ci.yml"><img src="https://github.com/MEhe132/one-punch-man-manga-downloader/actions/workflows/ci.yml/badge.svg" alt="Python CI" /></a>
   <a href="https://github.com/MEhe132/one-punch-man-manga-downloader"><img src="https://img.shields.io/badge/Python-3.9%2B-blue?style=flat-square&logo=python" alt="Python 3.9+" /></a>
   <a href="https://github.com/MEhe132/one-punch-man-manga-downloader"><img src="https://img.shields.io/badge/Dependencies-Requests%20%7C%20BS4%20%7C%20tqdm-orange?style=flat-square" alt="Dependencies" /></a>
   <a href="https://github.com/MEhe132/one-punch-man-manga-downloader"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat-square" alt="License: MIT" /></a>
@@ -33,12 +34,15 @@ A fast, multithreaded Python web scraper and manga downloader designed to scrape
 
 ```text
 one-punch-man-manga-downloader/
-├── downloader.py          # Core downloader engine, client & CLI parser
-├── main.py                # Command-line entry point
-├── requirements.txt       # Dependencies (requests, beautifulsoup4, tqdm)
-├── LICENSE                # MIT License
-├── .gitignore             # Git ignore rules for venv, cache, and downloaded media
-└── README.md              # Project documentation
+├── .github/
+│   └── workflows/
+│       └── ci.yml             # GitHub Actions CI matrix workflow (Python 3.10-3.12)
+├── downloader.py              # Core downloader engine, client & CLI parser
+├── main.py                    # Command-line entry point
+├── requirements.txt           # Dependencies (requests, beautifulsoup4, tqdm)
+├── LICENSE                    # MIT License
+├── .gitignore                 # Git ignore rules for venv, cache, and downloaded media
+└── README.md                  # Project documentation
 ```
 
 ---
